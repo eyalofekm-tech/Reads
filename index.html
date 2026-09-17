@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marginalia</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F0EBDC;
+    --ink: #2A2823;
+    --muted: #79725f;
+    --accent: #3B5D52;
+    --accent-soft: #CFDACB;
+    --rule: #DAD0B4;
+    --max: 620px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Lora', Georgia, 'Times New Roman', serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  a, button {
+    font-family: inherit;
+    color: inherit;
+  }
+
+  .wrap {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 6px;
+  }
+
+  .logo {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: 0.2px;
+  }
+
+  .day-count {
+    font-size: 14px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .tagline {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 10px 0 40px;
+  }
+
+  #back-link {
+    display: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-bottom: 22px;
+    font-size: 14px;
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  #back-link.visible { display: inline-block; }
+
+  main#hero {
+    animation: rise 0.6s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    main#hero { animation: none; }
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1.22;
+    margin: 0 0 10px;
+    letter-spacing: -0.2px;
+  }
+
+  .meta {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 26px;
+  }
+
+  .prose p {
+    font-size: 18px;
+    line-height: 1.75;
+    margin: 0 0 20px;
+    max-width: 62ch;
+  }
+
+  .caught-up {
+    padding: 20px 0 6px;
+  }
+
+  .caught-up h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 26px;
+    margin: 0 0 12px;
+  }
+
+  .caught-up p {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 50ch;
+  }
+
+  hr.rule {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 44px 0 28px;
+  }
+
+  h2.section-heading {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 20px;
+    margin: 0 0 8px;
+  }
+
+  #archive-empty {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  ul#archive-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+  }
+
+  .archive-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 14px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .archive-row:hover .archive-title,
+  .archive-row:focus-visible .archive-title {
+    color: var(--accent);
+  }
+
+  .archive-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    margin-top: 6px;
+  }
+
+  .dot.read { background: var(--accent); }
+  .dot.unread { background: transparent; }
+
+  .archive-day {
+    flex: 0 0 auto;
+    font-size: 13px;
+    color: var(--muted);
+    min-width: 46px;
+  }
+
+  .archive-title {
+    font-size: 16px;
+    transition: color 0.15s ease;
+  }
+
+  footer {
+    margin-top: 56px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  footer button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 4px;
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 420px) {
+    h1.title { font-size: 27px; }
+    .prose p { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="logo">Marginalia</div>
+    <div class="day-count" id="day-count"></div>
+  </header>
+  <div class="tagline">A short read, once a day.</div>
+
+  <button id="back-link">Back to today</button>
+
+  <main id="hero"></main>
+
+  <hr class="rule">
+
+  <section>
+    <h2 class="section-heading">Previously</h2>
+    <div id="archive-empty">Nothing to look back on yet. Tomorrow's read will start the list.</div>
+    <ul id="archive-list"></ul>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ---------------------------------------------------------------
+// Content. Add more entries any time by appending to this array —
+// each new one unlocks automatically on its scheduled day.
+// ---------------------------------------------------------------
+const READS = [
+  {
+    title: `The world you see is a forecast`,
+    body: `Most of what you're seeing right now isn't coming from your eyes. It's coming from a prediction your brain made a fraction of a second ago, based on everything that's happened so far — and your eyes are mostly just checking the prediction for errors.
+
+This is how vision actually works, more or less. Light hits your retina and travels to your visual cortex a little too slowly to explain how fast you react to things. So your brain runs ahead of the data: it guesses what the next instant will look like, and shows you the guess. When the guess matches reality, which is most of the time, you never notice the trick. You just feel like you're watching things happen live.
+
+You can catch the seams if you know where to look. That's why a magic trick works even when you're staring right at the sleight of hand — your brain fills in the "obvious" continuation instead of tracking every frame. It's why a jump scare in a familiar hallway lands harder than one in a strange room — your prediction was so confident that the error registers as a jolt. It's why time seems to skip or stutter during a car accident or a fall: the model breaks completely, and your brain has nothing pre-rendered to show you, so consciousness has to catch up in real time for once.
+
+There's something almost tender about this once you sit with it. Your brain isn't lazily faking reality to save effort — it's making its best offer, constantly, based on a lifetime of pattern. What you call "the present" is really a running best-guess, revised many times a second, mostly right, occasionally caught out. You've never once seen the world exactly as it is. You've only ever seen what your own history expected to find there.`
+  },
+  {
+    title: `Why the world looks dimmer after you make something`,
+    body: `There's a specific flatness that shows up after you finish something you were really absorbed in — a story, a song, a long stretch of building or drawing or planning a world in your head. Not sadness exactly. More like someone turned the saturation down on ordinary life. Colors look a little duller. Conversations feel a little further away. Nothing's wrong, but nothing quite lands either.
+
+It has a mundane explanation, which somehow makes it more comforting rather than less. While you're deep in a creative stretch, your attention is running at a much higher resolution than usual — tracking tone, rhythm, texture, causality, dozens of small decisions a minute, for hours or days. Your brain calibrates to that intensity as the new normal. Then the project ends, or you put it down, and regular life — which was always this quiet — suddenly reads as suspiciously quiet by comparison. It's not that the color drained out of the world. It's that you'd turned your own brightness all the way up, and now you're standing in the same room you always stood in, just without the extra wattage you got used to supplying yourself.
+
+People who make things for a living have private names for this and rarely say them out loud, because "reality feels less real after I finish a project" sounds like something to worry about rather than something ordinary. It isn't dissociation, and it isn't a warning sign. It's closer to what athletes feel after a big event, or what actors describe after closing night — a comedown from self-generated intensity, not a symptom of anything.
+
+It also passes on its own, usually within a few days, once your baseline recalibrates back down to meet you. The trick, if there is one, is not to mistake the quiet for something being wrong with you. You didn't lose the color. You came down from a height you built yourself, and normal ground always feels strange for a minute before it feels like ground again.`
+  },
+  {
+    title: `Every memory is the last time you remembered it`,
+    body: `For a long time neuroscientists assumed a memory got written once, like a photograph filed away, and stayed fixed until you pulled it back out to look at it. It turns out that's backwards. The act of remembering something makes it briefly unstable — chemically "unlocked" — before your brain saves it again. And whatever is happening while it's unlocked, your current mood, some new information, an unrelated worry, can quietly bleed into the memory before it's re-filed.
+
+This is called reconsolidation, and it explains a few things that used to seem strange. Why two siblings can have flatly contradicting memories of the same childhood afternoon, both telling the truth as they experience it. Why a memory of an ex can drift from painful to almost fond, or the reverse, with no new events involved — you've just kept re-remembering it through different emotional weather. Why some therapists ask people to recall a difficult memory from a calm, safe state on purpose: not to erase it, but to give it a gentler edit on its way back into storage.
+
+The slightly unsettling way to put this: the memory of your first bike ride, or your wedding day, or your worst fight, is not the original file. It's closer to the fortieth photocopy of a photocopy, softened and lightly redrawn each time, shaped a little by whoever you were on the day you last thought about it.
+
+The comforting way to put the same fact: nothing painful is sealed in amber forever just because it happened. Recalling an old hurt from a calmer, more resourced place isn't just processing it — it's a chance to hand it back to storage slightly kinder than you found it. You've been quietly rewriting yourself this whole time. You may as well do it on purpose sometimes.`
+  },
+  {
+    title: `Why unfinished things are louder than finished ones`,
+    body: `In the 1920s, a psychologist named Bluma Zeigarnik noticed something odd about waiters: they could hold an entire complicated order in their head perfectly, right up until they delivered it. The moment the plates hit the table, the order vanished from memory almost completely, as if it had never been there.
+
+The general version of this is called the Zeigarnik effect: unfinished tasks occupy far more mental space than completed ones, even after you've stopped actively working on them. Your mind doesn't file a task away once you've decided to do it — it files it away once it's actually done. Until then, it keeps a low hum of tension running in the background, quietly asking to be checked on.
+
+This is why a half-written email can bother you more than a finished one you haven't sent, why a load of laundry left in the washer nags at you more than laundry not yet started, and why lying in bed running through tomorrow's undone tasks feels different from running through today's completed ones — one is a live wire, the other is inert.
+
+There's a genuinely useful trick hidden in this. You don't have to finish a task to quiet the hum — you often just have to make a concrete plan for when and how you'll finish it. Writing down "I'll reply to this at 9am tomorrow" resolves a surprising amount of the tension, because your brain isn't actually asking you to do the thing right now. It's asking to be told the thing has somewhere to land. Once it has an appointment, it can stop tugging at your sleeve.
+
+Most mental clutter isn't procrastination. It's a long list of open loops that were never given a landing time.`
+  },
+  {
+    title: `You love it more because your hands were on it`,
+    body: `In a study that later gave its name to a whole psychological effect, researchers had people build simple flat-pack furniture — boxes, storage bins — and then asked them to bid on what they'd built, alongside identical pre-built versions. People consistently valued the one they'd assembled themselves more, sometimes dramatically more, even though it was, by any objective measure, the exact same object.
+
+This is the IKEA effect, and it isn't really about furniture. It shows up anywhere effort gets folded into something you end up owning. A garden you planted from seed matters more to you than an identical one you inherited already grown. A recipe you fumbled your way through and eventually got right tastes better to you than the same dish ordered at a restaurant, even when the restaurant's is objectively better cooked. A presentation you built from a blank page feels more "yours" than one you inherited and lightly edited, even if the edited one is stronger.
+
+The mechanism seems to be that effort gets read by your brain as a signal of value, almost regardless of the outcome. You don't love the shelf because it's well made. You love it because some part of you registers the hours of mild frustration and squinting at diagrams as proof that this thing matters, and that proof doesn't erase itself just because the shelf turned out slightly crooked.
+
+It cuts a useful way for anyone building a habit, a relationship, or a piece of work: the version you struggle through and half mess up will often mean more to you than the version handed to you clean. Not despite the friction. Because of it. Your attachment to things is, in part, a receipt for the effort you spent on them.`
+  },
+  {
+    title: `You think you're the finished draft`,
+    body: `Ask a 20-year-old how much they'll change in the next ten years, and they'll usually say "quite a bit." Ask that same person how much they've changed in the past ten years, and they'll usually say "enormously." Now ask a 40-year-old the same two questions. Same pattern: huge change looking backward, barely any predicted looking forward. Ask a 60-year-old. Same thing again.
+
+Psychologists call this the end-of-history illusion, and it shows up at every age they've tested. People are perfectly willing to admit they used to be a different person. They're strangely unwilling to believe they're still becoming one. Your past self feels like a rough draft. Your present self feels like the final version, mailed off, no further edits expected.
+
+It's an easy illusion to catch yourself in if you look for it. The values you're sure you'll hold forever, the relationships you're sure won't change shape, the tastes you assume are simply "you" now — a decade of actual data says a meaningful chunk of that will look different later, the same way the version of you from a decade ago barely resembles the one reading this. You weren't wrong then. You'll be more finished later than you are right now, and less finished than you'll be after that.
+
+The useful move isn't to distrust your current self — it's to hold your current preferences a little more loosely than they feel. The career you're sure is permanent, the opinion you're sure will never budge: treat them as your best current draft, not the printed final copy. History isn't over. It just always feels that way from wherever you happen to be standing in it.`
+  },
+  {
+    title: `You like it because you've seen it before`,
+    body: `In one of the more quietly unsettling findings in psychology, people who are shown random characters they can't read, over and over, for fractions of a second each, will later rate the ones they saw more often as more likeable than the ones they saw less often — with no idea why. They don't remember seeing them. They just prefer them.
+
+This is the mere-exposure effect: familiarity itself generates warmth, independent of merit, independent of even conscious memory of the exposure. It's a big part of why the song you hated the first three times on the radio becomes the song you can't skip by the tenth. Why the coworker who annoyed you in week one becomes one of your favorite people by month six, without either of you really changing. Why brands spend money on ads that don't even try to persuade you of anything — just to put the logo in front of your eyes again, because repetition alone does most of the persuading.
+
+There's a slightly uncomfortable implication buried in this: a decent amount of what you experience as "this feels right to me" is actually "this is familiar to me," and your brain doesn't always bother distinguishing the two. The opinions you hold most comfortably, the foods you call your favorites, the people you trust fastest — some real fraction of that is taste, and some real fraction is repetition wearing taste's clothing.
+
+It also cuts the other way, usefully. If something new feels off-putting on first contact — a piece of music, a food, a person — that reaction alone tells you almost nothing about whether you'll like it later. Sometimes disliking something is just what liking it looks like, before you've seen it enough times.`
+  },
+  {
+    title: `Nobody is watching you as closely as you think`,
+    body: `In a well-known experiment, students were asked to walk into a room full of strangers wearing an embarrassing T-shirt — a picture of a musician most people would find cringeworthy. Beforehand, they guessed that about half the room would notice and remember the shirt. Afterward, when the room was actually asked, fewer than a quarter had registered it at all.
+
+This gap has a name: the spotlight effect. You experience yourself as the main character of every room you walk into, so it feels obvious that other people are tracking your stumble, your outfit, your voice cracking, your typo in the group email. Meanwhile, everyone else in that room is starring in their own production, running the exact same spotlight over themselves, with correspondingly little processing power left over for you.
+
+This is easy to know intellectually and still hard to believe emotionally, because the feeling of being watched is so vivid from the inside. But it's worth sitting with the asymmetry: you remember your own awkward moment from three years ago in specific, wincing detail. Can you remember a single awkward moment a stranger had in front of you three years ago? Probably not, unless it was truly extreme — and if you can't, it's a safe bet nobody's holding onto yours either.
+
+None of this means nobody ever judges you. It means the volume of judgment you imagine pointed at you is almost always turned up far past what's actually happening, because you're the only one in the room who has to live inside your own reaction. Other people are too busy managing their own spotlight to run yours for very long.`
+  },
+  {
+    title: `You can't remember what it was like not to know this`,
+    body: `Once you learn something, it becomes almost impossible to accurately imagine what it was like before you knew it. Ask someone who's fluent in a skill to explain it to a beginner, and they'll routinely skip the steps that feel "obvious" to them now — not because they're bad teachers, but because their brain has quietly deleted the memory of those steps ever being hard.
+
+This is the curse of knowledge, and it explains a lot of bad instructions, confusing textbooks, and frustrating conversations with experts. The person who wrote the manual knows the system so well that they can no longer model a mind that doesn't know it. They're not withholding information on purpose. They've genuinely lost access to their own beginner self.
+
+It shows up in smaller ways constantly. You explain a joke's context to a friend without realizing you left out the one detail that makes it land. You give directions using a landmark that only makes sense if you already know the neighborhood. A parent forgets how genuinely hard tying shoelaces once was, and gets baffled by a five-year-old's tears over it.
+
+The uncomfortable part is that this curse is basically permanent for any given piece of knowledge — you can't deliberately unlearn something to remember what confusion about it felt like. But you can build a habit around it: whenever you're explaining something you know well, assume you've forgotten at least one step, and ask what a total stranger to this topic would need first. You'll never fully get back the eyes of your beginner self. You can at least go looking for someone else's.`
+  },
+  {
+    title: `Your beliefs are often just explanations for what you already did`,
+    body: `The usual assumption is that beliefs come first and actions follow: you believe something, so you act on it. A lot of the evidence points the other way. People routinely act first, for reasons that have nothing to do with conviction — convenience, social pressure, a decision made in a hurry — and then quietly build a belief that makes the action make sense, so they don't have to sit with having done something they can't explain to themselves.
+
+This is cognitive dissonance reduction, and one of the classic demonstrations of it is almost comically simple: pay one group of people a lot of money to say a boring task was interesting, and pay another group very little to say the same thing. The group paid less ends up actually rating the task as more interesting afterward. They had a big justification, money, for the first group's lie, and barely any for their own, so their brain manufactured a genuine belief instead — "I said it was interesting because it actually was," rather than "I said it because I was told to."
+
+This is happening quietly all the time. People come to genuinely love jobs they only took because nothing else was available. People convince themselves a purchase was wise mainly because they already made it. A position, once acted on publicly, tends to harden — not because new evidence arrived, but because reversing course would mean admitting the earlier action was a mistake, and that's heavier to carry than a slightly adjusted belief.
+
+It's worth occasionally asking, about a belief you hold strongly: did I arrive here by evidence, or did I act first and build the belief afterward to keep the story straight? Not every strongly held view is a rationalization. But some of the ones that feel most unshakeable got that way for exactly this reason.`
+  },
+  {
+    title: `You always think this time will be different`,
+    body: `Ask someone how long a task will take, and they'll usually answer as though everything is going to go right — no interruptions, no unexpected complications, no ordinary friction. This happens even when the same person has a long personal history of tasks taking longer than planned. Past evidence barely makes a dent in the next estimate.
+
+This is the planning fallacy, and the strange part isn't that people are bad at estimating — it's that people are consistently optimistic in the same direction, over and over, no matter how much contrary evidence they've personally accumulated. Ask a student how long a thesis chapter will take and they'll give a number based on a version of events where they don't get distracted, don't get sick, don't hit a section that turns out harder than expected. Then ask how long the last chapter actually took. The numbers rarely match, and the next estimate rarely learns from the gap.
+
+Part of the reason is that when you imagine the future task, you imagine the plan, not the friction. Friction is invisible until you're inside it. When you picture writing the report, you picture writing it smoothly — you don't spontaneously picture the meeting that runs long, because that wasn't part of the plan you were picturing.
+
+One of the few things that reliably helps is switching the question. Instead of asking "how long will this take me," ask "how long did the last three similar things actually take," and use that number instead of a fresh guess. It feels pessimistic. It's usually just accurate. The plan in your head was never wrong about the task — it was just missing everything that wasn't the task.`
+  },
+  {
+    title: `Losing $20 hurts more than finding $20 feels good`,
+    body: `If you lose a $20 bill on the street, the sting of that lasts longer and cuts deeper than the lift you'd get from finding a $20 bill, even though the dollar amount is identical either way. Across dozens of experiments, the ratio comes out roughly the same: losses are felt about twice as intensely as equivalent gains.
+
+This is loss aversion, and it quietly runs more of your daily decisions than it gets credit for. It's why the fear of losing what you have will usually beat the appeal of gaining something new of equal value — which is why people stay in mediocre jobs and mediocre routines long after a genuinely better option is sitting in plain view, not because they can't see it, but because the imagined loss of the current thing outweighs the imagined gain of the new one, even when a spreadsheet would say the new one is clearly ahead.
+
+It also explains a strange pattern in how people take risks. Someone who is up money at a poker table tends to play looser, because they're now gambling with "house money," a gain that doesn't feel as real as a loss would. Someone who is down money at the same table tends to take wildly bigger risks trying to get back to even, because the pain of the loss they're already sitting in outweighs any rational read of the odds.
+
+None of this means your losses aren't real. It means the feeling is calibrated to be louder than the facts warrant, by a factor of about two, every time. Worth remembering the next time a decision feels obviously risky purely because it involves giving something up — the math is quieter than the feeling.`
+  },
+  {
+    title: `More options can make you less happy with your choice`,
+    body: `In a well-known field experiment, a grocery store set up a tasting table with jam — sometimes offering 6 flavors, sometimes offering 24. The bigger display drew more browsers, as you'd expect. But the smaller display sold far more jam. People facing 24 choices bought less, and reported feeling less satisfied with what they did buy, than people facing 6.
+
+This is the paradox of choice: past a certain point, more options don't make you happier, they make deciding harder and your eventual choice feel worse, because every option you didn't pick becomes a small, specific regret instead of an abstraction. With 6 flavors, the ones you skipped are a vague blur. With 24, you remember exactly which one you passed over, and some part of you keeps quietly wondering about it.
+
+This shows up well beyond jam. A dating app with an effectively infinite scroll of options correlates with people feeling worse about the person they eventually choose, because "maybe someone slightly better is one swipe away" never fully switches off. A streaming service with 40,000 titles produces more scrolling and less watching than a video store with 400, because the cost of choosing wrong feels higher when the field of alternatives is enormous.
+
+The practical move isn't to seek out fewer options in general — it's to deliberately cap your own search once you're deciding something. Look at five apartments, then choose from those five. Read three reviews, then order. Not because the sixth option might not be better. Because the endless search for the sixth option is the thing quietly ruining your relationship with whichever option you eventually land on.`
+  },
+  {
+    title: `Your future self is basically a stranger to your brain`,
+    body: `Brain imaging studies have found something a little uncomfortable: when people think about themselves in the future — ten, twenty years out — the brain activity looks more like the pattern for thinking about a different person entirely than the pattern for thinking about yourself right now. Neurologically, future-you gets treated with something closer to the mild indifference you'd extend to a stranger, not the loyalty you'd extend to yourself.
+
+This helps explain temporal discounting: the well-documented tendency to consistently favor a smaller reward now over a larger reward later, even when the later reward is objectively much better on paper. It's not just impatience. It's that the "you" who will enjoy the retirement savings, or wake up well-rested because you went to bed on time, doesn't feel fully like you yet. You're not stealing from your future self so much as failing to recognize them as someone worth protecting.
+
+This is why abstract advice like "think about your future self" tends to fail — it's asking you to feel loyalty toward someone your brain has already filed as a near-stranger. What actually moves the needle in studies is making that future self more vivid and specific: picturing your own face age-progressed, writing a letter to yourself ten years out, imagining one concrete Tuesday morning in that future life rather than a vague concept called "the future." The more real future-you becomes as a person, the more your brain extends it the same instinctive loyalty it extends to you right now.
+
+You're not bad at planning ahead. You're just quietly making a lot of decisions on behalf of someone your brain hasn't fully decided is you yet.`
+  },
+  {
+    title: `Doing someone a favor makes you like them more`,
+    body: `The usual pattern is: you help someone because you like them. Benjamin Franklin apparently noticed the reverse was also true, and used it deliberately. Trying to win over a political rival who disliked him, he didn't do the rival a favor — he asked the rival for one, requesting to borrow a rare book. The rival lent it. Afterward, according to Franklin's own account, the man became noticeably warmer toward him, and stayed that way for years.
+
+This has since been studied properly and holds up: doing someone a favor tends to increase your own liking for them, not just their liking for you. The proposed mechanism runs through the same territory as cognitive dissonance — you don't typically go out of your way to help people you dislike, so when you catch yourself having done exactly that, some part of your brain quietly resolves the contradiction by deciding you must like them a bit more than you thought.
+
+It's a strange asymmetry to sit with. The instinct in a shaky relationship, professional or personal, is usually to do more for the other person, hoping generosity will be returned. The Ben Franklin effect suggests a less intuitive move: let them do something for you instead. Ask a slightly standoffish coworker for a small piece of advice in their area of expertise. It feels backward, almost presumptuous, to ask before you've given. But the asking is often what turns a stranger into someone who's already started, without quite noticing, treating you like a person worth liking.`
+  },
+  {
+    title: `You never hear from the ones who didn't make it`,
+    body: `During World War Two, engineers studying returning bomber planes mapped every bullet hole onto a diagram, planning to reinforce the areas hit most often. A statistician named Abraham Wald pointed out they had it backwards: the planes in front of them were the ones that survived their damage. The place to add armor wasn't where the surviving planes were hit — it was where the missing planes, the ones that never made it back, must have been hit instead. The holes you can see are proof a hit there is survivable. The blank spaces are where fatal hits go unrecorded, because there's no plane left to inspect.
+
+This is survivorship bias, and once you know to look for it, it shows up almost everywhere advice comes from. The wildly successful founder who dropped out of school gets a memoir; the thousand equally bold dropouts whose companies failed do not, so "just drop out and go for it" looks like better advice than the base rates support. The elderly relative who smoked a pack a day for sixty years and lived to ninety is a visible survivor; the people who did the same and didn't make it to sixty aren't around to balance the story.
+
+The fix isn't to distrust every success story. It's to remember that any sample made only of survivors is, by definition, missing exactly the data you'd need to judge the real odds. Whenever advice comes wrapped in someone's success, it's worth quietly asking: how many people tried the same thing and simply aren't in the room to tell you what happened to them.`
+  },
+  {
+    title: `Why you keep seeing the thing you just learned`,
+    body: `Learn a new word, and it seems to show up in conversation twice within the next week. Buy a specific model of car, and suddenly it feels like every third car on the road is the same one. Nothing changed in the world. Something changed in your filtering.
+
+This is the frequency illusion, sometimes called the Baader-Meinhof phenomenon. It runs on two ordinary mental habits stacked together. First, selective attention: your brain can't consciously process everything in your environment, so it's constantly filtering for what's currently relevant, and the new word or car just got promoted to "relevant" — so instances of it stop getting filtered out the way they used to, quietly, before you noticed them. Second, confirmation bias: once you register a few of these newly visible instances, your brain treats the pattern as meaningful and starts looking for more, without tracking all the times it doesn't show up.
+
+The car was always that common. The word was always in circulation. What changed was the size of the net you were holding up to the world, not the amount of fish actually swimming through it.
+
+It's a strangely reassuring thing to know, mostly because it defuses the eerie feeling of coincidence that comes with it. That sense of "this is happening to me specifically, right after I noticed it" is not a sign the universe is arranging things around you. It's a sign your attention just got sharper in one very specific spot, and the world, unchanged, is finally showing you what was there the whole time.`
+  },
+  {
+    title: `Why the upgrade stops feeling like an upgrade`,
+    body: `Buy a nicer apartment, get a raise, start dating someone genuinely great — and for a while, life feels noticeably better. Then, reliably, it stops feeling noticeably better, and starts feeling like the new normal. Not because the apartment got worse. Because your baseline moved up to meet the new circumstances, and "better than before" quietly became just "how things are now."
+
+This is the hedonic treadmill, and one of the more disorienting things about it is how symmetrical it is. Studies following lottery winners a year or two out find their reported happiness has largely returned to close to where it started before the win. Studies following people who experienced a serious accident find something similarly striking in the other direction: happiness, while genuinely lower right after the event, tends to recover substantially over time, further than most people predict for themselves or for others. Circumstances move your happiness a lot in the short term and surprisingly little in the long term, in both directions, because the baseline itself does most of the walking to meet wherever you land.
+
+This isn't an argument against wanting better things. It's a caution against expecting any single upgrade to be the thing that permanently changes how good your life feels. It won't, not because the upgrade fails, but because your baseline is built to treat almost anything as the new floor within a few months.
+
+The upside of the same mechanism, easy to forget in the moment: whatever hard thing you're adjusting to right now is very likely being overestimated in how long it will keep hurting this much. The treadmill runs both ways, and it never stops for long.`
+  },
+  {
+    title: `Why Mondays and birthdays make change feel possible`,
+    body: `Gym visits spike at the start of every month. Searches for "diet" jump every Monday, every January 1st, and right after birthdays. None of these dates change anything about a person's actual circumstances — the Tuesday after a Monday resolution is exactly as demanding as any other Tuesday. But something about a clean calendar boundary makes change feel newly available, in a way it didn't the day before.
+
+Researchers call this the fresh start effect. The theory is that temporal landmarks — a new week, a new month, a birthday, a new city — create a kind of mental accounting break. Your past slip-ups get filed under "old chapter," and the version of you standing after the landmark feels, briefly, unburdened by them. That psychological distance from your own recent failures is what makes trying again feel less futile than it did the week before.
+
+There's a real trick hidden in this, and a real trap. The useful part: you can manufacture a fresh-start landmark on purpose, instead of waiting for the calendar to hand you one. Starting a habit the first day of a season, or the morning after a trip, borrows the same lift as New Year's Day, on a timeline you control.
+
+The trap is relying on the feeling instead of building a system underneath it. The fresh start effect explains why the gym is packed every January and nearly empty by February — the emotional lift fades in a few weeks, and if nothing structural was built during that window, the old patterns quietly resume once the calendar stops feeling new. The landmark is real and worth using. It's just not, by itself, a plan.`
+  },
+  {
+    title: `You are, in part, a story you keep quietly rewriting`,
+    body: `Ask someone to tell you who they are, and they won't hand you a list of facts. They'll tell you a story — this happened, then this happened, and that's how I became the kind of person who does this. Psychologists call this narrative identity: a big part of your sense of self isn't a fixed inner essence, it's an ongoing autobiography you're constantly composing and re-narrating, often without noticing you're doing it.
+
+The interesting part is that the facts of your life stay mostly fixed, but the story built from them keeps changing shape depending on who's telling it and when. The same difficult childhood can be narrated as "proof that I'm resilient" or "the reason I struggle with trust," and people genuinely shift between these framings over years, sometimes over a single conversation, without any new facts entering the record. The event didn't change. The chapter it belongs to did.
+
+This matters because the framing isn't just decoration on top of the facts — it shapes what comes next. People who narrate a setback as a turning point in an ongoing story of growth tend to behave differently afterward than people who narrate the identical setback as proof that things always go wrong for them. Same event, different plot, different next chapter.
+
+None of this means you can rewrite your history into pure fiction and have it stick. But it does mean the story is more editable than it feels from inside it. You're not stuck with whatever interpretation first occurred to you at seventeen or in the middle of a bad year. You're the author as much as the character, and the manuscript is still open.`
+  },
+  {
+    title: `Your body is quietly doing some of your thinking`,
+    body: `Ask people to rate a stranger's personality while holding a warm cup of coffee, versus holding an iced coffee, and the warm-cup group rates the stranger as more generous and trustworthy — a purely physical sensation leaking into a social judgment that has nothing to do with temperature. Have people sit up straight versus slumped before a stressful task, and the upright group reports more confidence. Have people hold a pen in their teeth, forcing a smile-like expression, while watching cartoons, and they rate the cartoons funnier than people holding the pen with their lips, which forces more of a frown.
+
+This is embodied cognition: the idea that thought isn't a separate process running in a brain that happens to be attached to a body, issuing instructions downward. It runs in both directions. Your posture, temperature, and physical state feed back into your thoughts and emotions just as much as your thoughts direct your body.
+
+This is a genuinely useful lever, not just a curiosity, because it means you have a second entry point into a mood beyond just "thinking your way there." Feeling anxious before a hard conversation is partly a thought pattern, but it's also partly a physical posture — shallow breathing, tensed shoulders — and changing the physical half first will actually shift the mental half measurably, not just symbolically.
+
+The mind doesn't just live in the body. It's partly made of it. Which means on the days you can't think your way out of a bad state, you might be able to walk, breathe, or stand your way a decent distance out of it instead.`
+  },
+  {
+    title: `The best conversations aren't about each other`,
+    body: `There's a specific quality to bonding over a shared task, or a shared thing you're both looking at, that direct face-to-face conversation rarely produces on its own. Two people cooking together, watching the same strange event unfold, walking side by side rather than sitting across a table, often end up closer by the end of it than two people who sat down explicitly "to talk."
+
+Some relationship researchers call this the "third thing" effect: a shared external focus — the meal, the hike, the event on the screen — gives both people something to react to together, in real time, without the pressure of directly performing intimacy at each other. You learn a huge amount about someone from how they react to the third thing: what makes them laugh, what they notice, what they find beautiful, all revealed sideways, without either of you having to narrate your inner life on demand.
+
+This is probably why some of the most honest conversations of a person's life happen in a car, side by side, eyes on the road, rather than face to face. It's why old friends can sit through a boring task together in comfortable silence and come away feeling closer, while a forced "so, tell me about yourself" dinner between acquaintances can feel oddly hollow despite being, on paper, a more direct attempt at connection.
+
+If a relationship feels stuck or thin, the fix isn't always more direct conversation about the relationship. Sometimes it's finding a third thing to look at together, and letting the closeness arrive sideways, the way it usually does anyway.`
+  },
+  {
+    title: `Why 200,000 and 2,000,000 feel about the same`,
+    body: `Ask people how much they'd donate to save 2,000 birds from an oil spill, and then ask a separate group how much they'd donate to save 200,000 birds from the same kind of spill — a hundred times more birds — and the two donation amounts come back nearly identical. The number of birds barely moves the number of dollars, even though a hundred-fold increase in the problem should, rationally, track with a meaningfully larger response.
+
+This is scope insensitivity: human emotional response to a quantity flattens out very quickly, well before the actual quantity does. Your gut can tell the difference between one and five. It struggles to feel the difference between 200,000 and 2,000,000, because both numbers just register as "a lot," and "a lot" doesn't come in gradations the way small numbers do.
+
+This is part of why a single identifiable person's story reliably generates more charitable giving and more public concern than accurate statistics about a much larger number of anonymous people suffering the identical fate. It's not that people don't care about the larger number. It's that the larger number doesn't produce a proportionally larger feeling, because feelings were built for tracking a small tribe's worth of individuals, not for scaling into the hundreds of thousands.
+
+Knowing this doesn't make the feeling go away, but it lets you correct for it deliberately. When a decision genuinely should scale with the size of the problem, it's worth trusting the arithmetic over the gut, precisely because the gut was never built to feel the difference between big and much bigger in the first place.`
+  },
+  {
+    title: `Repetition feels a lot like truth`,
+    body: `Show people a false statement once, and they're appropriately skeptical. Show them the same false statement several times, spaced out over a few weeks, and their confidence that it's true measurably rises — even when they were told, clearly, the first time, that the statement was false. Familiarity keeps quietly outvoting memory.
+
+This is the illusory truth effect, and the mechanism behind it is almost embarrassingly simple: your brain uses how easily a statement comes to mind as a rough stand-in for how true it probably is. A sentence you've encountered before slides through your mind more smoothly than a brand-new one, and that ease of processing gets misread, below conscious reasoning, as a sign of accuracy. You're not re-evaluating the evidence each time you hear it again. You're noticing it feels more familiar, and "familiar" quietly gets rounded up to "probably true."
+
+This is a big part of why repeating a myth even to debunk it can backfire — "it is NOT true that X" still puts X in front of you one more time, and the repetition of X can outlast the memory of the word "not" attached to it. It's also why a falsehood repeated confidently and often can out-compete a more accurate but less frequently stated fact, regardless of how good the sourcing is on either side.
+
+The practical defense is almost too simple to trust: when a claim feels obviously true mainly because it feels familiar, it's worth pausing to ask whether you actually remember evidence for it, or whether you just remember having heard it before. Those are two very different things that feel, from the inside, exactly the same.`
+  },
+  {
+    title: `The state where time stops being a thing you notice`,
+    body: `There's a particular mental state — rock climbers describe it, surgeons describe it, musicians and writers mid-sentence describe it — where self-consciousness drops away, the activity and your awareness of doing it seem to merge into one thing, and hours pass in what feels like minutes. The psychologist who spent decades studying this, Mihaly Csikszentmihalyi, called it flow, and one of his more interesting findings is that people report it as one of the most satisfying states a human can be in — more satisfying, by their own report, than most forms of pure leisure.
+
+Flow tends to show up under a fairly specific set of conditions: the challenge in front of you is hard enough to demand your full attention, but not so hard that you're mostly anxious; you get some kind of immediate feedback on how you're doing, even something as simple as a note landing right or wrong; and the goal is clear enough that you're not spending attention figuring out what you're even supposed to be doing. Miss any of these — task too easy, feedback too delayed, goal too vague — and the state doesn't arrive, no matter how much you want it to.
+
+This is part of why passive scrolling rarely produces the deep satisfaction people expect from "downtime," while a genuinely hard hour spent absorbed in a skill often leaves people feeling more refreshed than the easy hour did. The mind doesn't actually want the absence of challenge. It wants a challenge sized correctly, with a clear target and honest feedback, so it can disappear into the doing of it.
+
+If a hobby keeps failing to feel satisfying no matter how much time you give it, it's worth checking these three conditions before giving up on the activity itself. Sometimes it's not the wrong hobby. It's the wrong difficulty setting.`
+  },
+  {
+    title: `Forgetting a word is not the same as losing it`,
+    body: `That specific frustration of knowing a word exists, knowing roughly how long it is, sometimes even knowing what letter it starts with, while the word itself refuses to surface — that has a name: the tip-of-the-tongue state. And it turns out to be genuinely different, mechanically, from ordinary forgetting.
+
+When you've truly forgotten something, there's no partial signal at all. Tip-of-the-tongue states are the opposite: your brain has successfully found the concept, the meaning, the context, everything except the specific sound-pattern of the word itself. It's a retrieval failure, not a storage failure. The information didn't leave. The specific address you use to reach it briefly went dark.
+
+This is why the word almost always surfaces later, unprompted, often when you've stopped consciously trying — in the shower, mid-conversation about something else entirely, right as you're falling asleep. Actively straining for it seems to make it worse, possibly because the effort keeps activating nearby, similar-sounding words that block the real one, the way pressing harder on a stuck zipper just seems to jam it further.
+
+It becomes more frequent with age, which understandably worries people, but the frequency is largely a function of vocabulary size — the more words and names you've accumulated over a lifetime, the more addresses there are to occasionally misfile, the same way a library with a hundred thousand books will produce more "I know it's on this shelf somewhere" moments than a library with a thousand.
+
+The reassuring part: a tip-of-the-tongue moment is proof the memory is intact, not evidence it's slipping. You're not losing the word. You're standing right next to it, momentarily unable to find the door.`
+  },
+  {
+    title: `The two hours you already spent don't belong to you anymore`,
+    body: `Once time, money, or effort has been spent, it's gone regardless of what you decide next — and yet people routinely make decisions as if the past investment is still a resource they get to spend again, by continuing something purely because they've already put so much into it. This is the sunk cost fallacy, and it's one of the more expensive ways the mind lies to itself.
+
+The film that's clearly bad but you finish anyway because you already sat through half of it. The failing project that keeps getting more funding, not because anyone still believes in it, but because canceling it now would mean "wasting" what's already been spent. The relationship that continues past the point either person is happy in it, propped up by years already invested, as though leaving now would retroactively undo the good years that already happened. In every case, the rational decision, judged only by what happens from this point forward, gets overridden by grief over resources that are, mathematically, already gone no matter what happens next.
+
+The tell is usually in the language people use to justify continuing: "I've already put so much into this." That sentence is almost always about the past, and the only thing worth deciding is about the future. The two hours already spent watching the bad film don't come back if you sit through the third hour. They also don't get worse if you walk out now. They're just gone, identically, either way.
+
+A useful reframe: imagine advising a friend who's never invested anything in this decision, choosing only between the two paths forward starting today. If they wouldn't choose to start this from scratch, the fact that you've already been at it a while isn't actually a reason to keep going. It just feels like one.`
+  },
+  {
+    title: `Why one bad review outweighs five good ones`,
+    body: `Get five glowing reviews and one scathing one, and the scathing one is the one you'll still be thinking about at midnight. This isn't a personal flaw. It's a documented, near-universal asymmetry: bad experiences, bad information, and bad feedback register more strongly, are remembered more vividly, and influence behavior more heavily than good ones of equal size.
+
+Researchers have found this pattern almost everywhere they've looked: a single instance of betrayal does more damage to trust in a relationship than many acts of kindness do to build it. Losing money hurts more than gaining the same amount pleases. A single criticism in a performance review outweighs, in how it's remembered, several pieces of praise. The likely evolutionary logic is straightforward and a little bleak: missing a threat could get an ancestor killed, while missing an opportunity for reward usually just meant a slightly worse day. Brains that weighted danger more heavily than pleasure tended to have more descendants, and here we all are, carrying that same weighting around in a world with far fewer actual predators in it.
+
+This has a specific practical consequence worth knowing: because the negative weighs more by default, positive and negative inputs aren't equally matched in a fair fight. Some researchers studying stable relationships found a rough ratio holds up — something like five positive interactions are needed to offset the felt weight of one negative one, just to keep things feeling emotionally even.
+
+None of this means the negative feedback is wrong or should be ignored. It means the emotional volume on bad news is turned up well past its actual informational size, by default. Worth remembering the next time one criticism threatens to erase an evening's worth of things that went fine.`
+  },
+  {
+    title: `The real Dunning-Kruger effect isn't what people think it is`,
+    body: `The popular version of the Dunning-Kruger effect goes something like: incompetent people are too incompetent to realize how incompetent they are, so they end up more confident than competent people. It gets used constantly as a way to call someone an overconfident idiot. The actual finding is narrower, and more interesting, than the meme version.
+
+What the original research found is that people who score in the bottom quartile on a skill tend to substantially overestimate their own ability, because the same lack of skill that makes them bad at the task also makes them bad at judging good performance on it — you need a working knowledge of grammar to notice your own grammar mistakes, and if you don't have it, you can't see what you're missing. Crucially, the same research also found that people at the top of the skill range tend to slightly underestimate their own relative standing, often assuming a task that felt easy to them must feel just as easy to everyone else. It's a distortion at both ends, not a story about geniuses knowing they're geniuses while idiots don't.
+
+The distortion is also specific to the exact skill being tested, not a personality trait. Someone can be genuinely and accurately unconfident about their public speaking while being wildly, unknowingly overconfident about their sense of direction — the two aren't linked, because judging each one is its own separate skill.
+
+The most useful personal takeaway isn't "watch out for overconfident idiots." It's narrower and more humbling: on any skill you haven't deliberately studied how to evaluate, your own sense of how good you are at it is close to worthless as data, in either direction, precisely because judging skill well is itself a skill you may not have.`
+  },
+  {
+    title: `Why your memories cluster around being young`,
+    body: `Ask older adults to recall the most vivid, most frequently-returned-to memories of their life, and they don't come back evenly spread across the decades. They cluster hard around adolescence and early adulthood, roughly ages ten to thirty, regardless of what actually happened during the other, often longer, stretches of life on either side. Researchers call this clustering the reminiscence bump, and it shows up consistently enough across cultures and generations that it's treated as a basic feature of how autobiographical memory works.
+
+A few explanations get proposed together rather than competing. One is that adolescence and early adulthood are when most "firsts" happen — first love, first real independence, first job, first heartbreak — and firsts get encoded more richly than repeats, because there's no earlier version to blend into. A forty-fifth ordinary Tuesday at a decade-old job doesn't get its own separate memory file the way the first week at that job did. The other is that this window is when a person's sense of identity is actively being assembled, so events from this period get woven directly into the ongoing life story in a way later, more settled events don't need to be.
+
+The slightly bittersweet implication is that the sheer density of vivid memory naturally thins out once a life settles into more repetition and less novelty — not because less is happening, but because more of what's happening resembles what happened last month, and resemblance is exactly what memory has trouble holding onto individually.
+
+There's a genuinely actionable piece hidden in this, though: novelty appears to be the actual ingredient, not youth itself. Deliberately introducing more firsts later in life — a new skill, a new place, a new kind of challenge — appears to produce a secondary, smaller bump in vivid memory formation at whatever age it happens. The years don't have to feel identical just because the decade does. The memory-making machinery is still running. It's just waiting on something new enough to bother filing separately.`
+  }
+];
+
+// ---------------------------------------------------------------
+// App logic
+// ---------------------------------------------------------------
+const START_KEY = 'marginalia_start_date';
+const READ_KEY = 'marginalia_read_indices';
+
+function utcDays(y, m, d) {
+  return Date.UTC(y, m, d) / 86400000;
+}
+
+function todayParts() {
+  const now = new Date();
+  return [now.getFullYear(), now.getMonth(), now.getDate()];
+}
+
+function getStartDate() {
+  let stored = localStorage.getItem(START_KEY);
+  if (!stored) {
+    const [y, m, d] = todayParts();
+    stored = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    localStorage.setItem(START_KEY, stored);
+  }
+  return stored; // 'YYYY-MM-DD'
+}
+
+function parseISODate(s) {
+  const [y, m, d] = s.split('-').map(Number);
+  return [y, m - 1, d];
+}
+
+function daysSinceStart() {
+  const start = parseISODate(getStartDate());
+  const today = todayParts();
+  const diff = utcDays(...today) - utcDays(...start);
+  return Math.max(0, Math.floor(diff));
+}
+
+function getReadSet() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(READ_KEY) || '[]'));
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function markRead(index) {
+  const s = getReadSet();
+  s.add(index);
+  localStorage.setItem(READ_KEY, JSON.stringify([...s]));
+}
+
+function readingMinutes(text) {
+  const words = text.trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+function formatDate(iso) {
+  const [y, m, d] = parseISODate(iso);
+  return new Date(y, m, d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+let viewingIndex = null; // null = show default ("today" or caught-up message)
+
+function renderProse(body) {
+  return body.split(/\n\n+/).map(p => `<p>${p}</p>`).join('');
+}
+
+function heroIndexFor(currentIndex, caughtUp) {
+  if (viewingIndex !== null) return viewingIndex;
+  return caughtUp ? null : currentIndex;
+}
+
+function renderHero(currentIndex, caughtUp) {
+  const hero = document.getElementById('hero');
+  const backLink = document.getElementById('back-link');
+  const showIndex = heroIndexFor(currentIndex, caughtUp);
+
+  if (showIndex === null) {
+    hero.innerHTML = `
+      <div class="caught-up">
+        <h1>You're all caught up</h1>
+        <p>That's every read available so far. The next one arrives tomorrow — or reread anything below in the meantime.</p>
+      </div>`;
+    backLink.classList.remove('visible');
+    return;
+  }
+
+  const read = READS[showIndex];
+  hero.innerHTML = `
+    <h1 class="title">${read.title}</h1>
+    <div class="meta">${readingMinutes(read.body)} min read</div>
+    <div class="prose">${renderProse(read.body)}</div>
+  `;
+  markRead(showIndex);
+  backLink.classList.toggle('visible', viewingIndex !== null);
+}
+
+function renderArchive(currentIndex, caughtUp) {
+  const list = document.getElementById('archive-list');
+  const empty = document.getElementById('archive-empty');
+  list.innerHTML = '';
+
+  const upperBound = caughtUp ? READS.length - 1 : currentIndex;
+  const skipIndex = heroIndexFor(currentIndex, caughtUp);
+
+  const indices = [];
+  for (let i = upperBound; i >= 0; i--) {
+    if (i === skipIndex) continue;
+    indices.push(i);
+  }
+
+  if (indices.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const readSet = getReadSet();
+  indices.forEach(i => {
+    const li = document.createElement('li');
+    const isRead = readSet.has(i);
+    li.innerHTML = `
+      <button class="archive-row" data-index="${i}">
+        <span class="dot ${isRead ? 'read' : 'unread'}"></span>
+        <span class="archive-day">Day ${i + 1}</span>
+        <span class="archive-title">${READS[i].title}</span>
+      </button>`;
+    list.appendChild(li);
+  });
+
+  list.querySelectorAll('.archive-row').forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewingIndex = parseInt(btn.dataset.index, 10);
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+}
+
+function renderFooter() {
+  const start = getStartDate();
+  const footer = document.getElementById('footer');
+  footer.innerHTML = `Started ${formatDate(start)}. <button id="change-start">Change</button>`;
+  document.getElementById('change-start').addEventListener('click', () => {
+    const input = prompt('Set the start date (YYYY-MM-DD). Day 1 will fall on this date:', getStartDate());
+    if (!input) return;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) {
+      alert('Please use the format YYYY-MM-DD, for example 2026-09-17.');
+      return;
+    }
+    localStorage.setItem(START_KEY, input);
+    viewingIndex = null;
+    renderAll();
+  });
+}
+
+function renderAll() {
+  const elapsed = daysSinceStart();
+  const currentIndex = Math.min(elapsed, READS.length - 1);
+  const caughtUp = elapsed >= READS.length;
+  document.getElementById('day-count').textContent = `Day ${elapsed + 1}`;
+  renderHero(currentIndex, caughtUp);
+  renderArchive(currentIndex, caughtUp);
+  renderFooter();
+}
+
+document.getElementById('back-link').addEventListener('click', () => {
+  viewingIndex = null;
+  renderAll();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+renderAll();
+</script>
+</body>
+</html>
